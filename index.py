@@ -2,6 +2,9 @@
 from nltk import word_tokenize
 import string
 import os
+import getopt
+import sys
+import re
 from node import Node
 
 # Find list of unique tokens in all file path with respect to its document ID
@@ -51,4 +54,26 @@ def printDict(dictionary):
         k = key.term + ", " + str(key.frequency)
         print k, dictionary[key]
 
-process_documents("reuters/training/")
+def usage():
+    print "usage: " + sys.argv[0] + " -i directory-of-documents -d dictionary-file -p postings-file"
+
+directory_of_documents = dictionary_file = postings_file = None
+try:
+    opts, args = getopt.getopt(sys.argv[1:], 'i:d:p:')
+except getopt.GetoptError, err:
+    usage()
+    sys.exit(2)
+for o, a in opts:
+    if o == '-i':
+        directory_of_documents = a
+    elif o == '-d':
+        dictionary_file = a
+    elif o == '-p':
+        postings_file = a
+    else:
+        assert False, "unhandled option"
+if directory_of_documents == None or dictionary_file == None or postings_file == None:
+    usage()
+    sys.exit(2)
+
+process_documents(directory_of_documents)

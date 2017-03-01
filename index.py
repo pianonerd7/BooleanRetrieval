@@ -10,7 +10,7 @@ def process_documents(file_path):
         if filename == ".DS_Store":
             continue
         new_file_path = file_path + filename
-        tables.append(process_document(new_file_path, filename))
+        tables.append(process_document(new_file_path, int(filename)))
     print merge_tables(tables)
 
 def process_document(file, doc_ID):
@@ -33,6 +33,12 @@ def merge_tables(table_array):
             if key not in dictionary:
                 dictionary[key] = []
             dictionary[key].append(table[key])
+    return sort_dictionary(dictionary)
+
+def sort_dictionary(dictionary):
+    for key in dictionary:
+        posting = dictionary[key]
+        dictionary[key] = sorted(posting)
     return dictionary
 
 process_documents("reuters/training/")

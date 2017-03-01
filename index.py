@@ -48,7 +48,7 @@ def sort_dictionary(dictionary):
 
 def printDict(dictionary):
     for key in dictionary:
-        k = key.token + ", " + str(key.frequency)
+        k = key.term + ", " + str(key.frequency)
         print k, dictionary[key]
 
 process_documents("reuters/training/")

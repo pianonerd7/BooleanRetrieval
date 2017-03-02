@@ -24,8 +24,7 @@ def process_documents(file_path):
 
 def process_document(file, doc_ID):
     content = open(file, "r").read()
-    punctuations = list(string.punctuation)
-    result = [i for i in word_tokenize(content) if i not in punctuations]
+    result = process_words(content)
 
     table = dict()
 
@@ -34,6 +33,15 @@ def process_document(file, doc_ID):
             table[word] = doc_ID
 
     return table
+
+def process_words(content):
+    punctuations = list(string.punctuation)
+
+    result = []
+    for i in word_tokenize(content):
+        if i not in punctuations:
+            result.append(i.lower())
+    return result
 
 def merge_tables(table_array):
     dictionary = dict()
@@ -64,38 +72,24 @@ def write_post_to_disk(dictionary, postings_file):
     with open(postings_file, mode="wb") as pf:
         for key in dictionary:
             dict_to_disk[key] = Node(key, len(dictionary[key]), pf.tell(), pf.write(pickle.dumps(dictionary[key])))
-    return dict_to_disk
-
-    '''
-    diction = None
-    with open(dictionary_file, mode="rb") as newdf:
-        diction = pickle.load(newdf)
-        print (diction)
-    
-    with open(postings_file, mode='rb') as newpf:
-        newpf.seek(diction["directors"].get_pointer())
-        dta = pickle.loads(newpf.read(diction["directors"].length))
-        print (dta)
-        print (type(dta))
-        print (dta[0])
-    '''    
+    return dict_to_disk 
 
 def disk_to_memory(dictionary_file):
     training_data = pickle.load(open(file(dictionary_file), 'rb'))
-    print (training_data)
+    #print (training_data)
 
 def printDict(dictionary):
     for key in dictionary:
         k = key.term + ", " + str(key.frequency)
         print (k, dictionary[key])
-'''
+
 def usage():
-    print "usage: " + sys.argv[0] + " -i directory-of-documents -d dictionary-file -p postings-file"
+    print ("usage: " + sys.argv[0] + " -i directory-of-documents -d dictionary-file -p postings-file")
 
 directory_of_documents = dictionary_file = postings_file = None
 try:
     opts, args = getopt.getopt(sys.argv[1:], 'i:d:p:')
-except getopt.GetoptError, err:
+except getopt.GetoptError:
     usage()
     sys.exit(2)
 for o, a in opts:
@@ -112,5 +106,3 @@ if directory_of_documents == None or dictionary_file == None or postings_file ==
     sys.exit(2)
 
 process_documents(directory_of_documents)
-'''
-process_documents("reuters/training/")

@@ -1,4 +1,4 @@
-OPERATORS = { "(" : 0, ")" : 0, "NOT" : 1, "AND" : 2, "OR" : 3 }
+OPERATORS = { "(" : 3, ")" : 3, "NOT" : 2, "AND" : 1, "OR" : 0 }
 
 def query_from_file_to_array(query_file_path):
     queries = []
@@ -8,10 +8,7 @@ def query_from_file_to_array(query_file_path):
             if line[-1:] == "\n":
                 query = line[:-1]
             queries.append(query)
-    print (queries)
-    
-    for q in queries:
-        string_to_word_arr(q)
+    return queries
 
 def string_to_word_arr(query):
     word_arr = []
@@ -25,9 +22,36 @@ def string_to_word_arr(query):
             word_arr.append(")")
         else:
             word_arr.append(word)
+    return word_arr
 
-#def query_to_stack_shunting_yard(query):
+def query_to_stack_shunting_yard(query_word_arr):
+    word_stack = []
+    operator_stack = []
 
-
-
-query_from_file_to_array("queries")
+    for item in query_word_arr:
+        if item in OPERATORS:
+            peek = operator_stack[-1:]
+            if len(peek) == 0:
+                operator_stack.append(item)
+            else:
+                if peek[0] == "(":
+                    operator_stack.append(item)
+                elif item == ")":
+                    pop = operator_stack.pop()
+                    while pop != "(":
+                        word_stack.append(pop)
+                        pop = operator_stack.pop()
+                elif OPERATORS[peek[0]] < OPERATORS[item]:
+                    operator_stack.append(item)
+                elif OPERATORS[peek[0]] > OPERATORS[item]:
+                    word_stack.append(operator_stack.pop())
+                    operator_stack.append(item)
+                else:
+                    operator_stack.append(item)
+        else:
+            word_stack.append(item)
+    
+    while len(operator_stack) != 0:
+        word_stack.append(operator_stack.pop())
+        
+    return word_stack

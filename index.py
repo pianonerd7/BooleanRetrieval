@@ -7,10 +7,7 @@ import sys
 import re
 from node import Node
 import json
-try:
-    import cPickle as pickle
-except ImportError:
-    import pickle
+import pickle
 
 # Find list of unique tokens in all file path with respect to its document ID
 def process_documents(file_path):
@@ -55,18 +52,21 @@ def sort_dictionary(dictionary):
     return new_dictionary
 
 def write_to_disk(dictionary, dictionary_file, postings_file):
-    new_dict = dict()
+    dict_to_disk = write_post_to_disk(dictionary, postings_file)
+    write_dict_to_disk(dict_to_disk, dictionary_file)
+
+def write_dict_to_disk(dict_to_disk, dictionary_file):
+    with open(dictionary_file, mode="wb") as df:
+        pickle.dump(dict_to_disk, df)
+        
+def write_post_to_disk(dictionary, postings_file):
+    dict_to_disk = dict()
     with open(postings_file, mode="wb") as pf:
         for key in dictionary:
-            pointer = pf.tell()
-            size = pf.write(pickle.dumps(dictionary[key]))
-            print (pointer, size)
-            new_dict[key] = Node(key, len(dictionary[key]), pointer, size)
+            dict_to_disk[key] = Node(key, len(dictionary[key]), pf.tell(), pf.write(pickle.dumps(dictionary[key])))
+    return dict_to_disk
 
-    # Write Dictionary
-    with open(dictionary_file, mode="wb") as df:
-        pickle.dump(new_dict, df)
-    
+    '''
     diction = None
     with open(dictionary_file, mode="rb") as newdf:
         diction = pickle.load(newdf)
@@ -75,6 +75,10 @@ def write_to_disk(dictionary, dictionary_file, postings_file):
     with open(postings_file, mode='rb') as newpf:
         newpf.seek(diction["directors"].get_pointer())
         dta = pickle.loads(newpf.read(diction["directors"].length))
+        print (dta)
+        print (type(dta))
+        print (dta[0])
+    '''    
 
 def disk_to_memory(dictionary_file):
     training_data = pickle.load(open(file(dictionary_file), 'rb'))
@@ -84,7 +88,6 @@ def printDict(dictionary):
     for key in dictionary:
         k = key.term + ", " + str(key.frequency)
         print (k, dictionary[key])
-
 '''
 def usage():
     print "usage: " + sys.argv[0] + " -i directory-of-documents -d dictionary-file -p postings-file"

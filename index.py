@@ -51,59 +51,39 @@ def sort_dictionary(dictionary):
     new_dictionary = dict()
     for key in dictionary:
         posting = dictionary[key]
-        #cur_node = Node(key, len(posting))
         new_dictionary[key] = sorted(posting)
-        #new_dictionary[cur_node] = sorted(posting)
     return new_dictionary
 
 def write_to_disk(dictionary, dictionary_file, postings_file):
-     # Write Postings
     new_dict = dict()
     with open(postings_file, mode="wb") as pf:
         for key in dictionary:
             pointer = pf.tell()
-            pf.write(pickle.dumps(dictionary[key]))
-            new_dict[key] = Node(key, len(dictionary[key]), pointer)
+            size = pf.write(pickle.dumps(dictionary[key]))
+            print (pointer, size)
+            new_dict[key] = Node(key, len(dictionary[key]), pointer, size)
 
     # Write Dictionary
     with open(dictionary_file, mode="wb") as df:
         pickle.dump(new_dict, df)
     
+    diction = None
     with open(dictionary_file, mode="rb") as newdf:
         diction = pickle.load(newdf)
-        print diction
-
-    '''df = file(dictionary_file, 'wb')
-    pf = file(postings_file, 'wb')
-
-    for node in dictionary:
-        posting = dictionary[node]
-        node.set_pointer(pf.tell())
-        node.set_length(len(posting))
-        pickle.dump(posting, pf, pickle.HIGHEST_PROTOCOL)
-    #for node in dictionary:
-    #    df.write(pickle.dumps(node))
-    #    pf.write(pickle.dumps(dictionary[node]))
-    df.close()
-    pf.close()
-    '''
+        print (diction)
+    
+    with open(postings_file, mode='rb') as newpf:
+        newpf.seek(diction["directors"].get_pointer())
+        dta = pickle.loads(newpf.read(diction["directors"].length))
 
 def disk_to_memory(dictionary_file):
     training_data = pickle.load(open(file(dictionary_file), 'rb'))
-    print training_data
-
-    #d = dict()
-    #file(dictionary_file).seek()
-    #print pickle.loads(dictionary_file)
-   # for line in file(dictionary_file):
-    #    d[i] = pickle.loads(line)
-   #     print d[i]
-   #     i = i + 1
+    print (training_data)
 
 def printDict(dictionary):
     for key in dictionary:
         k = key.term + ", " + str(key.frequency)
-        print k, dictionary[key]
+        print (k, dictionary[key])
 
 '''
 def usage():

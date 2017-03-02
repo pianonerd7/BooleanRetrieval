@@ -1,5 +1,19 @@
 OPERATORS = { "(" : 3, ")" : 3, "NOT" : 2, "AND" : 1, "OR" : 0 }
 
+def query_file_to_infix(query_file_path):
+    query_arr = query_from_file_to_array(query_file_path)
+
+    query_word_arr = []
+    for query in query_arr:
+        query_word_arr.append(string_to_word_arr(query))
+    print (query_word_arr)
+
+    infix = []
+    for query in query_word_arr:
+        infix.append(query_to_stack_shunting_yard(query))
+
+    return infix
+    
 def query_from_file_to_array(query_file_path):
     queries = []
     with open(query_file_path, mode="r") as qf:
@@ -53,5 +67,5 @@ def query_to_stack_shunting_yard(query_word_arr):
     
     while len(operator_stack) != 0:
         word_stack.append(operator_stack.pop())
-        
+
     return word_stack

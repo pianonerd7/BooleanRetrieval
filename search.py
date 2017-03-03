@@ -1,7 +1,8 @@
 import getopt
 import sys
 import pickle
-from queryParser import query_file_to_infix
+from queryParser import *
+from node import Node
 
 def read_dictionary_to_memory(dictionary_file_path):
     dictionary = None
@@ -12,23 +13,81 @@ def read_dictionary_to_memory(dictionary_file_path):
 
 def find_posting_in_disk(dictionary, term, posting_file_path):
     with open(posting_file_path, mode='rb') as pf:
-        pf.seek(dictionary[term].get_pointer())
-        dta = pickle.loads(pf.read(dictionary[term].length))
+        if term in dictionary:
+            pf.seek(dictionary[term].get_pointer())
+            return pickle.loads(pf.read(dictionary[term].length))
+        else:
+            return []
 
-def process_queries(query_file_path, output_file_of_results):
+def process_queries(dictionary_file, postings_file, query_file_path, output_file_of_results):
+    dictionary = read_dictionary_to_memory(dictionary_file)
     infix_arr = query_file_to_infix(query_file_path)
-    results = process_queries(infix_arr)
-    write_to_output(results, output_file_of_results)
+
+    for infix in infix_arr:
+        results = process_query(infix, dictionary, postings_file)
+        write_to_output(results, output_file_of_results)
 
 def write_to_output(results, output_file_of_results):
-    with open(output_file_of_results, mode="wb") as of:
-        for result in results:
-            of.write(result)
+    print ("result", results)
+   # with open(output_file_of_results, mode="wb") as of:
+    #    for result in results:
+    #        of.write(result)
 
-def process_queries(infix_arr):
-    for item in infix_arr:
+def process_query(infix_arr, dictionary, posting_file_path):
+    result_cache = infix_arr
+    while len(result_cache) > 1:
+        for i in range(0, len(result_cache)):
+            item = result_cache[i]
+            if item in OPERATORS:
+                first = second = None
+                #if item == "NOT":
+                    
+                if item == "AND":
+                    if type(result_cache[i-2]) == str:
+                        first = find_posting_in_disk(dictionary, result_cache[i-2], posting_file_path)
+                    else:
+                        first = result_cache[i-2]
+                    if type(result_cache[i-1]) == str:
+                        second = find_posting_in_disk(dictionary, result_cache[i-1], posting_file_path)
+                    else:
+                        second = result_cache[i-1]
+                    temp_result = and_operator(first, second)
 
+                    new_cache = []
+                    if i-3 >= 0 or i+1 < len(result_cache):
+                        if i-3 >= 0:
+                            new_cache=result_cache[:1-3] + temp_result
+                        if i+1 < len(result_cache):
+                            new_cache = new_cache + result_cache[i+1:]
+                    else:
+                        new_cache = temp_result
+                    result_cache = new_cache
+                    #result_cache = result_cache[:i-3] + temp_result + result_cache[i+1:]
+                elif item == "OR":
+                    if type(result_cache[i-2]) == str:
+                        first = find_posting_in_disk(dictionary, result_cache[i-2], posting_file_path)
+                    else:
+                        first = result_cache[i-2]
+                    if type(result_cache[i-1]) == str:
+                        second = find_posting_in_disk(dictionary, result_cache[i-1], posting_file_path)
+                    else:
+                        second = result_cache[i-1]
+                    temp_result = or_operator(first, second)
+                    result_cache = result_cache[:i-3] + temp_result + result_cache[i+1:]
+    
+    if len(result_cache) == 1:
+        if type(result_cache[0]) == str:
+            return find_posting_in_disk(dictionary, result_cache[0], posting_file_path)
+    
+    print (result_cache[0])
+    return result_cache[0]
 
+#bill OR Gates AND (vista OR XP) AND NOT mac
+def and_operator(list1, list2):
+    return list(set(list1).intersection(list2))
+
+def or_operator(list1, list2):
+    return list(set().union(list1, list2))
 '''
 def usage():
     print "usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results"
@@ -53,7 +112,8 @@ for o, a in opts:
 if dictionary_file == None or postings_file == None or file_of_queries == None or output_file_of_results == None:
     usage()
     sys.exit(2)
-'''
 
-diction = read_dictionary_to_memory("df")
-find_posting_in_disk(diction, "directors", "pf")
+'''
+#diction = read_dictionary_to_memory("df")
+#find_posting_in_disk(diction, "directors", "pf")
+process_queries("df", "pf", "queries", "RESULT")

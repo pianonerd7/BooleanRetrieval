@@ -35,7 +35,13 @@ def write_to_output(results, output_file_of_results):
 
 def process_query(infix_arr, dictionary, posting_file_path):
     result_cache = infix_arr
-    while len(result_cache) > 1:
+    final_result = []
+
+    if len(result_cache) == 1:
+        #if type(result_cache[0]) == str:
+        return find_posting_in_disk(dictionary, result_cache[0], posting_file_path)
+
+    while len(result_cache) != 0:
         for i in range(0, len(result_cache)):
             item = result_cache[i]
             if item in OPERATORS:
@@ -54,13 +60,16 @@ def process_query(infix_arr, dictionary, posting_file_path):
                     temp_result = and_operator(first, second)
 
                     new_cache = []
-                    if i-3 >= 0 or i+1 < len(result_cache):
-                        if i-3 >= 0:
-                            new_cache=result_cache[:1-3] + temp_result
+                    if i-2 > 0 or i+1 < len(result_cache):
+                        if i-2 > 0:
+                            wrap_list = [temp_result]
+                            new_cache=result_cache[:i-2] + wrap_list
                         if i+1 < len(result_cache):
                             new_cache = new_cache + result_cache[i+1:]
                     else:
-                        new_cache = temp_result
+                        final_result = temp_result
+                        result_cache = []
+                        break
                     result_cache = new_cache
                     #result_cache = result_cache[:i-3] + temp_result + result_cache[i+1:]
                 elif item == "OR":
@@ -73,14 +82,21 @@ def process_query(infix_arr, dictionary, posting_file_path):
                     else:
                         second = result_cache[i-1]
                     temp_result = or_operator(first, second)
-                    result_cache = result_cache[:i-3] + temp_result + result_cache[i+1:]
+
+                    new_cache = []
+                    if (i-3 >= 0) or (i+1 < len(result_cache)):
+                        if i-3 >= 0:
+                            new_cache=result_cache[:1-3] + temp_result
+                        if i+1 < len(result_cache):
+                            new_cache = new_cache + result_cache[i+1:]
+                    else:
+                        final_result = temp_result
+                        result_cache=[]
+                        break
+                    result_cache = new_cache
     
-    if len(result_cache) == 1:
-        if type(result_cache[0]) == str:
-            return find_posting_in_disk(dictionary, result_cache[0], posting_file_path)
-    
-    print (result_cache[0])
-    return result_cache[0]
+    print (final_result)
+    return final_result
 
 #bill OR Gates AND (vista OR XP) AND NOT mac
 def and_operator(list1, list2):

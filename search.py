@@ -57,7 +57,6 @@ def not_term_operator(dictionary, term_in_docs):
     return list(result_set)
 
 def process_query_rec(infix_arr, dictionary, posting_file_path):
-    print (infix_arr)
     if len(infix_arr) == 1:
         return find_posting_in_disk(dictionary, infix_arr[0], posting_file_path)
 
@@ -143,9 +142,7 @@ def process_query_rec(infix_arr, dictionary, posting_file_path):
                     break
     return result_cache, final_result
     
-#bill OR Gates AND (vista OR XP) AND NOT mac
 def and_operator(list1, list2):
-    print (list1, list2)
     skip_interval1 = int(math.sqrt(len(list1)))
     skip_interval2 = int(math.sqrt(len(list2)))
 
@@ -171,14 +168,12 @@ def and_operator(list1, list2):
                 if list2[ptr2 + skip_interval2] <= list1[ptr1]:
                     ptr2 = ptr2 + skip_interval2
                 else:
-                    ptr1 += 1
+                    ptr2 += 1
             else:
                 ptr2 += 1
-
     return result
 
 def or_operator(list1, list2):
-    print (list1, list2)
     skip_interval1 = math.sqrt(len(list1))
     skip_interval2 = math.sqrt(len(list2))
 
@@ -201,13 +196,8 @@ def or_operator(list1, list2):
     return result
 
 def has_skip_node(skip_interval, ptr, max):
-    v1 = ptr != 0
-    v2 = ptr%skip_interval == 0
-    v3 = ptr + skip_interval < max
-    return v1 and v2 and v3
-    #return ptr != 0 and ptr%skip_interval == 0 and ptr + skip_interval < max
+    return ptr != 0 and ptr%skip_interval == 0 and ptr + skip_interval < max
 
-'''
 def usage():
     print ("usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results")
 
@@ -231,11 +221,6 @@ for o, a in opts:
 if dictionary_file == None or postings_file == None or file_of_queries == None or output_file_of_results == None:
     usage()
     sys.exit(2)
-'''
 
-l1 = [1, 5, 10, 15]
-l2 = [1, 5, 12, 13, 14, 15]
-
-print(or_operator(l1, l2))
-#process_queries("dictionary.txt", "postings.txt", "queries", "result.txt")
-#process_queries(dictionary_file, postings_file, file_of_queries, output_file_of_results)
+#process_queries("dictionary.txt", "postings.txt", "queries.txt", "result.txt")
+process_queries(dictionary_file, postings_file, file_of_queries, output_file_of_results)

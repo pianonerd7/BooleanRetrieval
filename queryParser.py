@@ -13,7 +13,7 @@ def query_file_to_infix(query_file_path):
         infix.append(query_to_stack_shunting_yard(query))
 
     return infix
-    
+
 def query_from_file_to_array(query_file_path):
     queries = []
     with open(query_file_path, mode="r") as qf:

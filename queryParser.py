@@ -8,7 +8,6 @@ def query_file_to_infix(query_file_path):
     query_word_arr = []
     for query in query_arr:
         query_word_arr.append(string_to_word_arr(query))
-    print (query_word_arr)
 
     infix = []
     for query in query_word_arr:

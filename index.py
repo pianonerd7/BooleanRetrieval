@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from nltk import word_tokenize
+from nltk import sent_tokenize, word_tokenize, PorterStemmer
 import string
 import os
 import getopt
@@ -18,30 +18,26 @@ def process_documents(file_path):
         new_file_path = file_path + filename
         tables.append(process_document(new_file_path, int(filename)))
     dictionary = merge_tables(tables)
-    #printDict(dictionary)
+    print (dictionary)
     write_to_disk(dictionary, "df", "pf")
-    #disk_to_memory("df")
 
 def process_document(file, doc_ID):
     content = open(file, "r").read()
-    result = process_words(content)
 
+    terms = []
+    with open(file, mode="r") as f:
+        for line in f:
+            for sent in sent_tokenize(line):
+                for word in word_tokenize(sent):
+                    terms.append(PorterStemmer().stem(word.lower()))
+    
     table = dict()
 
-    for word in result:
+    for word in terms:
         if word not in table:
             table[word] = doc_ID
 
     return table
-
-def process_words(content):
-    punctuations = list(string.punctuation)
-
-    result = []
-    for i in word_tokenize(content):
-        if i not in punctuations:
-            result.append(i.lower())
-    return result
 
 def merge_tables(table_array):
     dictionary = dict()

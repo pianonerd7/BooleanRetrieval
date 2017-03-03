@@ -29,7 +29,6 @@ def process_queries(dictionary_file, postings_file, query_file_path, output_file
     write_to_output(results, output_file_of_results)
 
 def write_to_output(results, output_file_of_results):
-    print ("result", results)
     with open(output_file_of_results, mode="w") as of:
         for result in results:
             of.write(format_result(result) + "\n")
@@ -180,10 +179,8 @@ def or_operator(list1, list2):
     ptr1 = 0
     ptr2 = 0
 
-    print (len(list1), len(list2))
     result = []
     while ptr1 < len(list1) and ptr2 < len(list2):
-        print (ptr1, ptr2)
         if list1[ptr1] == list2[ptr2]:
             if list1[ptr1] not in result:
                 result.append(list1[ptr1])

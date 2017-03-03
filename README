@@ -1,0 +1,70 @@
+This is the README file for A0163945W's submission
+email:e0147987@u.nus.edu
+
+== General Notes about this assignment ==
+
+Place your comments or requests here for Min to read.  Discuss your
+architecture or experiments in general.  A paragraph or two is usually
+sufficient.
+
+I am using python 3.6 for this project. 
+
+indexing
+Reads each file from a directory, and gets a list of unique words in the 
+file (The data structure looks like [word, doc_ID]. Do this for all the 
+files in that directory. Then merge to a big table that looks something 
+like [word, list of doc_ID]. Then save dictionary and posting to disk.
+-------------------------------------------------------------------------
+searching
+We first parse the queries to infix notation by using the shunting yard
+algorithm. Then, we get a list of queries all in infix notations. we
+feed it to a recursive function that calculates the query for us.
+
+== Files included with this submission ==
+
+List the files in your submission here and provide a short 1 line
+description of each file.  Make sure your submission's files are named
+and formatted correctly.
+
+index.py - Index all the text files in that directory, and saves to disk
+node.py - Represents each dictionary item
+queryParser.py - Parses the query to infix notation using the shunting
+yard algorithm
+search.py - Answers the query by looking in the disk of the postings file
+and writing it to the output file
+
+== Statement of individual work ==
+
+Please initial one of the following statements.
+
+[X] I, A0163945W, certify that I have followed the CS 3245 Information
+Retrieval class guidelines for homework assignments.  In particular, I
+expressly vow that I have followed the Facebook rule in discussing
+with others in doing the assignment and did not take notes (digital or
+printed) from the discussions.  
+
+[ ] I, A0000000X, did not follow the class rules regarding homework
+assignment, because of the following reason:
+
+<Please fill in>
+
+I suggest that I should be graded as follows: I completed all the work and adhere to the 
+Policy stated above.
+
+<Please fill in>
+
+== References ==
+
+<Please list any websites and/or people you consulted with for this
+assignment and state their role>
+
+stackoverflow for manipulating python data structures (such as how are foreach loop is sytaxtically written in python) 
+Professor's python slides for various python data structures/file IO things (very helpful!)
+
+http://stackoverflow.com/questions/23317458/how-to-remove-punctuation
+
+more stackoverflow for how to use pickle, and various python libraries 
+
+Googled a ton on the shunting yard algorithm, also read the algorithm on wikipedia
+
+Basically copied the professor's given skeleton from HW1 for input commands from terminal

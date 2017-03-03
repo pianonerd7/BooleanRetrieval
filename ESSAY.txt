@@ -1,0 +1,51 @@
+I have commented out the code used to answer the essays questions. 
+
+1. You will observe that a large portion of the terms in the dictionary are numbers. 
+However, we normally do not use numbers as query terms to search. Do you think it is 
+a good idea to remove these number entries from the dictionary and the postings lists? 
+Can you propose methods to normalize these numbers? How many percentage of reduction 
+in disk storage do you observe after removing/normalizing these numbers?
+
+I don't think it is a good idea to remove these number entries from the dictionary and
+the postings lists. Considering that the larger part of stoarge is on disk, and nowadays
+disk storage is relatively cheap, and the fact that indexing is done prior to query processing
+so the existence of the numbers will not actually affect performance. Keeping it could
+also offer information to a small subset of queries, since the chances of searching for 
+a specific number is quite low. 
+
+I used python's string method isdigit() to remove the numbers. I didn't actually see an 
+improvement from removing the numbers, since both dictionary.txt and postings.txt of 
+with numbers and without are both are 2MB. I think this could be affected by how I serialized
+the dictionary and postings object.
+
+2. What do you think will happen if we remove stop words from the dictionary and postings 
+file? How does it affect the searching phase?
+
+The size of the dictionary and posting will decrease, especially posting, since stop words
+are very common. 
+
+The affect for boolean retrieval in my opinion is very minimal. The chances of me searching
+for the word "the" in documents seem like a pretty useless query to me. However, if I were 
+searching in google for "the best roast duck" it would be pretty significant. 
+
+I used the stopwords from nltk.corpus and re-indexed. The new dictionary.txt is 29KB compared
+to 2MB previously, and the new postings.txt is 9KB compared to 2MB previously. I would say
+that this is a good storage advantage, since stop words are pretty useless in boolean 
+retrieval anyway.
+
+3. The NLTK tokenizer may not correctly tokenize all terms. What do you observe from 
+the resulting terms produced by sent_tokenize() and word_tokenize()? Can you propose 
+rules to further refine these results?
+
+sent_tokenize doesn't take care of "\n", but it seems like untaken care of "\n" are taken care
+of by word_tokenize. Overall, I think sent_tokenize does a pretty good job. I've tested some 
+strings with different delimeters, and it was able to split at the right places. In the event
+that I missed out on specific delimeters, we could always have a white list of delimeters to 
+split on, and let sent_tokenize know that as well.
+
+word_tokenize treats hyphenated words as a single word. For example, the word "year-ago" gets
+treated as one word, instead of two. Sometimes this doesn't make sense, while other times it 
+does, such as "father-in-law", which wouldn't make much sense when the words are apart. This is
+to say that we cannot use one rule to generalize all hyphenated words. Perhaps it is better 
+to just leave the hyphenated words alone, so that by not changing their suffix, their true 
+meaning is maintained. 

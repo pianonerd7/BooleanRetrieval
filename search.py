@@ -3,6 +3,7 @@ import sys
 import pickle
 from queryParser import *
 from node import Node
+import math
 
 def read_dictionary_to_memory(dictionary_file_path):
     dictionary = None
@@ -144,10 +145,68 @@ def process_query_rec(infix_arr, dictionary, posting_file_path):
     
 #bill OR Gates AND (vista OR XP) AND NOT mac
 def and_operator(list1, list2):
-    return list(set(list1).intersection(list2))
+    print (list1, list2)
+    skip_interval1 = int(math.sqrt(len(list1)))
+    skip_interval2 = int(math.sqrt(len(list2)))
+
+    ptr1 = 0
+    ptr2 = 0
+
+    result = []
+    while ptr1 < len(list1) and ptr2 < len(list2):
+        if list1[ptr1] == list2[ptr2]:
+            result.append(list1[ptr1])
+            ptr1 += 1
+            ptr2 += 1
+        elif list1[ptr1] < list2[ptr2]:
+            if has_skip_node(skip_interval1, ptr1, len(list1)):
+                if list1[ptr1 + skip_interval1] <= list2[ptr2]:
+                    ptr1 = ptr1 + skip_interval1
+                else:
+                    ptr1 += 1
+            else:
+                ptr1 += 1
+        elif list1[ptr1] > list2[ptr2]:
+            if has_skip_node(skip_interval2, ptr2, len(list2)):
+                if list2[ptr2 + skip_interval2] <= list1[ptr1]:
+                    ptr2 = ptr2 + skip_interval2
+                else:
+                    ptr1 += 1
+            else:
+                ptr2 += 1
+
+    return result
 
 def or_operator(list1, list2):
-    return list(set().union(list1, list2))
+    print (list1, list2)
+    skip_interval1 = math.sqrt(len(list1))
+    skip_interval2 = math.sqrt(len(list2))
+
+    ptr1 = 0
+    ptr2 = 0
+
+    result = []
+    while ptr1 < len(list1):
+        if list1[ptr1] == list2[ptr2]:
+            if list1[ptr1] not in result:
+                result.append(list1[ptr1])
+            ptr1 += 1
+            ptr2 += 1
+        elif list1[ptr1] < list2[ptr2]:
+            result.append(list1[ptr1])
+            ptr1 += 1
+        elif list1[ptr1] > list2[ptr2]:
+            result.append(list2[ptr2])
+            ptr2 += 1
+    return result
+
+def has_skip_node(skip_interval, ptr, max):
+    v1 = ptr != 0
+    v2 = ptr%skip_interval == 0
+    v3 = ptr + skip_interval < max
+    return v1 and v2 and v3
+    #return ptr != 0 and ptr%skip_interval == 0 and ptr + skip_interval < max
+
 '''
 def usage():
     print ("usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results")
@@ -173,5 +232,10 @@ if dictionary_file == None or postings_file == None or file_of_queries == None o
     usage()
     sys.exit(2)
 '''
-process_queries("dictionary.txt", "postings.txt", "queries", "result.txt")
+
+l1 = [1, 5, 10, 15]
+l2 = [1, 5, 12, 13, 14, 15]
+
+print(or_operator(l1, l2))
+#process_queries("dictionary.txt", "postings.txt", "queries", "result.txt")
 #process_queries(dictionary_file, postings_file, file_of_queries, output_file_of_results)

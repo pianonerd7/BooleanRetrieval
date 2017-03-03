@@ -50,7 +50,13 @@ def process_query(infix_arr, dictionary, posting_file_path):
         result_cache, final_result = process_query_rec(result_cache, dictionary, posting_file_path)
     return final_result
 
+def not_term_operator(dictionary, term_in_docs):
+    all_documents = dictionary["ALL_FILES"]
+    result_set = set(all_documents) - set(term_in_docs)
+    return list(result_set)
+
 def process_query_rec(infix_arr, dictionary, posting_file_path):
+    print (infix_arr)
     if len(infix_arr) == 1:
         return find_posting_in_disk(dictionary, infix_arr[0], posting_file_path)
 
@@ -60,9 +66,29 @@ def process_query_rec(infix_arr, dictionary, posting_file_path):
     for i in range(0, len(result_cache)):
         item = result_cache[i]
         if type(item) != list and item in OPERATORS:
-            first = second = None
-            #if item == "NOT":
-                
+            first = second = term = None
+            if item == "NOT":
+                if type(result_cache[i-1]) == str:
+                    term = find_posting_in_disk(dictionary, result_cache[i-1], posting_file_path)
+                else:
+                    term = result_cache[i-1]
+                temp_result = not_term_operator(dictionary, term)
+
+                new_cache = []
+                if i-1 > 0 or i + 1 < len(result_cache):
+                    wrap_list = [temp_result]
+                    new_cache = wrap_list
+                    if i - 1 > 0:
+                        new_cache = result_cache[:i-1] + wrap_list
+                    if i + 1 < len(result_cache):
+                        new_cache = new_cache + result_cache[i+1:]
+                    result_cache = new_cache
+                    break
+                else:
+                    final_result = temp_result
+                    result_cache = []
+                    break
+
             if item == "AND":
                 if type(result_cache[i-2]) == str:
                     first = find_posting_in_disk(dictionary, result_cache[i-2], posting_file_path)
@@ -122,7 +148,7 @@ def and_operator(list1, list2):
 
 def or_operator(list1, list2):
     return list(set().union(list1, list2))
-
+'''
 def usage():
     print ("usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results")
 
@@ -146,5 +172,6 @@ for o, a in opts:
 if dictionary_file == None or postings_file == None or file_of_queries == None or output_file_of_results == None:
     usage()
     sys.exit(2)
-
-process_queries(dictionary_file, postings_file, file_of_queries, output_file_of_results)
+'''
+process_queries("dictionary.txt", "postings.txt", "queries", "result.txt")
+#process_queries(dictionary_file, postings_file, file_of_queries, output_file_of_results)

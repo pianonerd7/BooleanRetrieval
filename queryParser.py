@@ -1,3 +1,5 @@
+from nltk import PorterStemmer
+
 OPERATORS = { "(" : 3, ")" : 3, "NOT" : 2, "AND" : 1, "OR" : 0 }
 
 def query_file_to_infix(query_file_path):
@@ -30,12 +32,21 @@ def string_to_word_arr(query):
     for word in query.split():
         if word[0] == "(":
             word_arr.append("(")
-            word_arr.append(word[1:])
+            if word[1:] not in OPERATORS:
+                word_arr.append(PorterStemmer().stem(word[1:]))
+            else:
+                word_arr.append(word[1:])
         elif word[-1:] == ")":
-            word_arr.append(word[:-1])
+            if word[:-1] not in OPERATORS:
+                word_arr.append(PorterStemmer().stem(word[:-1]))
+            else:
+                word_arr.append(word[:-1])
             word_arr.append(")")
         else:
-            word_arr.append(word)
+            if word not in OPERATORS:
+                word_arr.append(PorterStemmer().stem(word))
+            else:
+                word_arr.append(word)
     return word_arr
 
 def query_to_stack_shunting_yard(query_word_arr):

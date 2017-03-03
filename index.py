@@ -8,6 +8,7 @@ import re
 from node import Node
 import json
 import pickle
+#from nltk.corpus import stopwords 
 
 # Find list of unique tokens in all file path with respect to its document ID
 def process_documents(file_path, dictionary_file, postings_file):
@@ -20,7 +21,6 @@ def process_documents(file_path, dictionary_file, postings_file):
         tables.append(process_document(new_file_path, int(filename)))
         files.append(int(filename))
     dictionary = merge_tables(tables)
-    #print (dictionary)
     write_to_disk(dictionary, dictionary_file, postings_file, files)
 
 def process_document(file, doc_ID):
@@ -31,6 +31,8 @@ def process_document(file, doc_ID):
         for line in f:
             for sent in sent_tokenize(line):
                 for word in word_tokenize(sent):
+                    #if word not in stopwords.words("english"):
+                    #if word.isdigit() == False:
                     terms.append(PorterStemmer().stem(word.lower()))
     
     table = dict()

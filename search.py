@@ -8,7 +8,6 @@ def read_dictionary_to_memory(dictionary_file_path):
     dictionary = None
     with open(dictionary_file_path, mode="rb") as df:
         dictionary = pickle.load(df)
-        print (dictionary)
     return dictionary
 
 def find_posting_in_disk(dictionary, term, posting_file_path):
@@ -23,15 +22,22 @@ def process_queries(dictionary_file, postings_file, query_file_path, output_file
     dictionary = read_dictionary_to_memory(dictionary_file)
     infix_arr = query_file_to_infix(query_file_path)
 
+    results = []
     for infix in infix_arr:
-        results = process_query(infix, dictionary, postings_file)
-        write_to_output(results, output_file_of_results)
+        results.append(process_query(infix, dictionary, postings_file))
+    write_to_output(results, output_file_of_results)
 
 def write_to_output(results, output_file_of_results):
     print ("result", results)
-   # with open(output_file_of_results, mode="wb") as of:
-    #    for result in results:
-    #        of.write(result)
+    with open(output_file_of_results, mode="w") as of:
+        for result in results:
+            of.write(format_result(result) + "\n")
+
+def format_result(result_list):
+    result_str = ""
+    for item in result_list:
+        result_str = result_str + str(item) + " "
+    return result_str
 
 def process_query(infix_arr, dictionary, posting_file_path):
     result_cache = infix_arr
@@ -42,8 +48,6 @@ def process_query(infix_arr, dictionary, posting_file_path):
 
     while len(result_cache) > 1:
         result_cache, final_result = process_query_rec(result_cache, dictionary, posting_file_path)
-    
-    print (final_result)
     return final_result
 
 def process_query_rec(infix_arr, dictionary, posting_file_path):
@@ -110,8 +114,6 @@ def process_query_rec(infix_arr, dictionary, posting_file_path):
                     final_result = temp_result
                     result_cache=[]
                     break
-                #result_cache = new_cache
-    print (final_result)
     return result_cache, final_result
     
 #bill OR Gates AND (vista OR XP) AND NOT mac

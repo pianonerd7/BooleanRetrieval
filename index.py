@@ -10,16 +10,18 @@ import json
 import pickle
 
 # Find list of unique tokens in all file path with respect to its document ID
-def process_documents(file_path):
+def process_documents(file_path, dictionary_file, postings_file):
     tables = []
+    files = []
     for filename in os.listdir(file_path):
         if filename == ".DS_Store":
             continue
         new_file_path = file_path + filename
         tables.append(process_document(new_file_path, int(filename)))
+        files.append(int(filename))
     dictionary = merge_tables(tables)
-    print (dictionary)
-    write_to_disk(dictionary, "df", "pf")
+    #print (dictionary)
+    write_to_disk(dictionary, dictionary_file, postings_file, files)
 
 def process_document(file, doc_ID):
     content = open(file, "r").read()
@@ -55,8 +57,9 @@ def sort_dictionary(dictionary):
         new_dictionary[key] = sorted(posting)
     return new_dictionary
 
-def write_to_disk(dictionary, dictionary_file, postings_file):
+def write_to_disk(dictionary, dictionary_file, postings_file, files):
     dict_to_disk = write_post_to_disk(dictionary, postings_file)
+    dict_to_disk["ALL_FILES"] = files
     write_dict_to_disk(dict_to_disk, dictionary_file)
 
 def write_dict_to_disk(dict_to_disk, dictionary_file):
@@ -72,7 +75,6 @@ def write_post_to_disk(dictionary, postings_file):
 
 def disk_to_memory(dictionary_file):
     training_data = pickle.load(open(file(dictionary_file), 'rb'))
-    #print (training_data)
 
 def printDict(dictionary):
     for key in dictionary:
@@ -101,4 +103,4 @@ if directory_of_documents == None or dictionary_file == None or postings_file ==
     usage()
     sys.exit(2)
 
-process_documents(directory_of_documents)
+process_documents(directory_of_documents, dictionary_file, postings_file)

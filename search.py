@@ -11,7 +11,7 @@ def read_dictionary_to_memory(dictionary_file_path):
     return dictionary
 
 def find_posting_in_disk(dictionary, term, posting_file_path):
-    with open(posting_file_path, mode='rb') as pf:
+    with open(posting_file_path, mode="rb") as pf:
         if term in dictionary:
             pf.seek(dictionary[term].get_pointer())
             return pickle.loads(pf.read(dictionary[term].length))
@@ -122,14 +122,14 @@ def and_operator(list1, list2):
 
 def or_operator(list1, list2):
     return list(set().union(list1, list2))
-'''
+
 def usage():
-    print "usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results"
+    print ("usage: " + sys.argv[0] + " -d dictionary-file -p postings-file -q file-of-queries -o output-file-of-results")
 
 dictionary_file = postings_file = file_of_queries = output_file_of_results = None
 try:
     opts, args = getopt.getopt(sys.argv[1:], 'd:p:q:o:')
-except getopt.GetoptError, err:
+except getopt.GetoptError:
     usage()
     sys.exit(2)
 for o, a in opts:
@@ -147,7 +147,4 @@ if dictionary_file == None or postings_file == None or file_of_queries == None o
     usage()
     sys.exit(2)
 
-'''
-#diction = read_dictionary_to_memory("df")
-#find_posting_in_disk(diction, "directors", "pf")
-process_queries("df", "pf", "queries", "RESULT")
+process_queries(dictionary_file, postings_file, file_of_queries, output_file_of_results)

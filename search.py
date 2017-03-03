@@ -174,14 +174,16 @@ def and_operator(list1, list2):
     return result
 
 def or_operator(list1, list2):
-    skip_interval1 = math.sqrt(len(list1))
-    skip_interval2 = math.sqrt(len(list2))
+    skip_interval1 = int(math.sqrt(len(list1)))
+    skip_interval2 = int(math.sqrt(len(list2)))
 
     ptr1 = 0
     ptr2 = 0
 
+    print (len(list1), len(list2))
     result = []
-    while ptr1 < len(list1):
+    while ptr1 < len(list1) and ptr2 < len(list2):
+        print (ptr1, ptr2)
         if list1[ptr1] == list2[ptr2]:
             if list1[ptr1] not in result:
                 result.append(list1[ptr1])
@@ -193,6 +195,11 @@ def or_operator(list1, list2):
         elif list1[ptr1] > list2[ptr2]:
             result.append(list2[ptr2])
             ptr2 += 1
+    
+    if ptr1 < len(list1):
+        result = result + list1[ptr1:]
+    elif ptr2 < len(list2):
+        result = result + list2[ptr2:]
     return result
 
 def has_skip_node(skip_interval, ptr, max):
@@ -222,5 +229,4 @@ if dictionary_file == None or postings_file == None or file_of_queries == None o
     usage()
     sys.exit(2)
 
-#process_queries("dictionary.txt", "postings.txt", "queries.txt", "result.txt")
 process_queries(dictionary_file, postings_file, file_of_queries, output_file_of_results)
